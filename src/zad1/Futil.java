@@ -2,6 +2,7 @@ package zad1;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -22,7 +23,17 @@ public class Futil {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
 						throws IOException {
-					System.out.println(file);
+					File f = new File(file.toString());
+					if(!f.isDirectory()) {
+						FileInputStream in = new FileInputStream(f);
+						ByteBuffer buffer = ByteBuffer.allocate(100);
+						FileChannel channel = in.getChannel();
+						channel.read(buffer);
+						channel.close();
+						System.out.println(buffer.get(0));
+					}
+
+
 					return FileVisitResult.CONTINUE;
 				}
 				@Override
@@ -47,5 +58,17 @@ public class Futil {
 	}
 
 	private static void put(ByteBuffer b,int val){b.put((byte)val);}
+
+	private void writeChaneL(String fileName, byte[] data)
+			throws Exception{
+
+		File file = new File(fileName);
+		FileInputStream in = new FileInputStream(file);
+		FileChannel channel = in.getChannel();
+
+		int size = (int)channel.size();
+		ByteBuffer buffer = ByteBuffer.allocate(size);
+
+	}
 
 }
