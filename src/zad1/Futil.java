@@ -2,8 +2,11 @@ package zad1;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,13 +27,9 @@ public class Futil {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
 						throws IOException {
-					File f = new File(file.toString());
-					if(!f.isDirectory()) {
-						byte []b = readChannel(file.toString());
-						System.out.println(Arrays.toString(b));
 
-					}
-
+					CharBuffer buffer = readChannel(file.toString());
+					writeChannel(resultFileName,buffer);
 
 					return FileVisitResult.CONTINUE;
 				}
@@ -41,7 +40,6 @@ public class Futil {
 						System.out.println(dir);
 						return FileVisitResult.CONTINUE;
 					} else {
-						// directory iteration failed
 						throw e;
 					}
 				}
@@ -55,22 +53,22 @@ public class Futil {
 
 	}
 
-	private static void put(ByteBuffer b,int val){b.put((byte)val);}
 
-	private static void writeChannel(String fileName,byte[] data)
+	private static void writeChannel(String fileName,CharBuffer data)
 		throws IOException{
 
-		ByteBuffer buffer = ByteBuffer.wrap(data);
+		Charset charSet = StandardCharsets.UTF_8;
+		ByteBuffer result = charSet.encode(data);
 
-		FileOutputStream out = new FileOutputStream(fileName);
-		FileChannel channel = out.getChannel();
+		FileChannel channel = new FileOutputStream(fileName,true).getChannel();
+		channel.position(channel.size());
 
-		channel.write(buffer);
+		channel.write(result);
 		channel.close();
 
 	}
 
-	private static byte[] readChannel(String fileName)
+	private static CharBuffer readChannel(String fileName)
 			throws IOException{
 
 		File file = new File(fileName);
@@ -80,14 +78,15 @@ public class Futil {
 		int size = (int)channel.size();
 		ByteBuffer buffer = ByteBuffer.allocate(size);
 
-		int nBytes = channel.read(buffer);
+		channel.read(buffer);
 		channel.close();
 		buffer.flip();
 
-		byte[] result = new byte[nBytes];
-		buffer.get(result);
-		return result;
+		Charset inCSet = Charset.forName("cp1250");
+
+		return inCSet.decode(buffer);
 
 	}
+
 
 }
