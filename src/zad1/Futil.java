@@ -59,8 +59,21 @@ public class Futil {
 
 	private static void put(ByteBuffer b,int val){b.put((byte)val);}
 
-	private void writeChaneL(String fileName, byte[] data)
-			throws Exception{
+	private void writeChannel(String fileName,byte[] data)
+		throws IOException{
+
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+
+		FileOutputStream out = new FileOutputStream(fileName);
+		FileChannel channel = out.getChannel();
+
+		channel.write(buffer);
+		channel.close();
+
+	}
+
+	private byte[] readChannel(String fileName)
+			throws IOException{
 
 		File file = new File(fileName);
 		FileInputStream in = new FileInputStream(file);
@@ -68,6 +81,14 @@ public class Futil {
 
 		int size = (int)channel.size();
 		ByteBuffer buffer = ByteBuffer.allocate(size);
+
+		int nBytes = channel.read(buffer);
+		channel.close();
+		buffer.flip();
+
+		byte[] result = new byte[nBytes];
+		buffer.get(result);
+		return result;
 
 	}
 
