@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 
 public class Futil {
 
@@ -25,12 +26,9 @@ public class Futil {
 						throws IOException {
 					File f = new File(file.toString());
 					if(!f.isDirectory()) {
-						FileInputStream in = new FileInputStream(f);
-						ByteBuffer buffer = ByteBuffer.allocate(100);
-						FileChannel channel = in.getChannel();
-						channel.read(buffer);
-						channel.close();
-						System.out.println(buffer.get(0));
+						byte []b = readChannel(file.toString());
+						System.out.println(Arrays.toString(b));
+
 					}
 
 
@@ -59,7 +57,7 @@ public class Futil {
 
 	private static void put(ByteBuffer b,int val){b.put((byte)val);}
 
-	private void writeChannel(String fileName,byte[] data)
+	private static void writeChannel(String fileName,byte[] data)
 		throws IOException{
 
 		ByteBuffer buffer = ByteBuffer.wrap(data);
@@ -72,7 +70,7 @@ public class Futil {
 
 	}
 
-	private byte[] readChannel(String fileName)
+	private static byte[] readChannel(String fileName)
 			throws IOException{
 
 		File file = new File(fileName);
