@@ -3,7 +3,6 @@ package zad1;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -12,13 +11,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 
 public class Futil {
 
 
 	public static void processDir(String dirName, String resultFileName) {
 
+		File file = new File(resultFileName);
+		if(file.exists()) {
+			boolean deleted = file.delete();
+		}
 		File path = new File(dirName);
 
 		try {
