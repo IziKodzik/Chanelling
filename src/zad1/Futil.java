@@ -6,10 +6,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class Futil {
@@ -18,8 +15,14 @@ public class Futil {
 	public static void processDir(String dirName, String resultFileName) {
 
 		File file = new File(resultFileName);
+
 		if(file.exists()) {
 			boolean deleted = file.delete();
+		}
+		try {
+			boolean created = file.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		File path = new File(dirName);
 
@@ -62,10 +65,10 @@ public class Futil {
 		Charset charSet = StandardCharsets.UTF_8;
 		ByteBuffer result = charSet.encode(data);
 
-		FileChannel channel = new FileOutputStream(fileName,true).getChannel();
+		FileChannel channel = FileChannel.open(Paths.get(fileName),StandardOpenOption.WRITE);
 		channel.position(channel.size());
 
-		channel.write(result);
+		channel.write(result,channel.size());
 		channel.close();
 
 	}
@@ -73,9 +76,7 @@ public class Futil {
 	private static CharBuffer readChannel(String fileName)
 			throws IOException{
 
-		File file = new File(fileName);
-		FileInputStream in = new FileInputStream(file);
-		FileChannel channel = in.getChannel();
+		FileChannel channel = FileChannel.open(Paths.get(fileName),StandardOpenOption.READ);
 
 		int size = (int)channel.size();
 		ByteBuffer buffer = ByteBuffer.allocate(size);
